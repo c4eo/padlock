@@ -3,7 +3,10 @@ require "spec_helper"
 describe User do
   let(:object) { double(:object) }
   subject { User.create!(name: "Jimmy John") }
-
+  before do
+    allow(object).to receive_message_chain(:id).and_return(1)
+    allow(object).to receive_message_chain("class.name").and_return("Widget")
+  end
   describe "#padlock" do
 
     it "delegates to Padlock.lock" do
@@ -40,7 +43,14 @@ describe User do
   end
 
   describe "#locked?" do
-    before { subject.stub_chain(:padlocks, :include?).and_return(include?) }
+    before do
+      proxy = double(:object)
+      allow(proxy).to receive_message_chain("exists?")
+        .and_return(include?)
+      allow(subject).to receive_message_chain("padlocks.where")
+        .with(hash_including(:lockable_id, :lockable_type))
+        .and_return(proxy)
+    end
 
     context "when included" do
       let(:include?) { true }

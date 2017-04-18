@@ -118,17 +118,27 @@ describe Padlock do
       let(:locked?) { true }
 
       it "sets a new value on the updated_at column and saves it" do
-        expect(object).to receive(:update_attribute).with(:updated_at, anything)
-        Padlock.touch(object)
+        expect(object).to receive(:id)
+        proxy = double(:object)
+        expect(proxy).to receive_message_chain("update_all")
+          .with(hash_including(:updated_at => anything))
+          .and_return(true)
+        expect(Padlock).to receive_message_chain("where")
+          .with(hash_including(:id))
+          .and_return(proxy)
+        res = Padlock.touch(object)
+        expect(res).to be_truthy
       end
     end
 
     context "when unlocked" do
       let(:locked?) { false }
 
-      it "leaves the object uneffected" do
-        expect(object).to_not receive(:update_attribute)
-        Padlock.touch(object)
+      it "leaves the object unaffected" do
+        expect(object).to_not receive(:id)
+        expect(Padlock).to_not receive(:where)
+        res = Padlock.touch(object)
+        expect(res).to be_falsy
       end
     end
   end

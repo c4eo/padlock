@@ -1,6 +1,7 @@
 require "spec_helper"
+require "generators/padlock/install_generator"
 
-describe Padlock::Generators::PadlockGenerator, type: :generator do
+describe Padlock::Generators::InstallGenerator, type: :generator do
   destination File.expand_path("../../tmp", __FILE__)
 
   before do
