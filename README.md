@@ -8,7 +8,7 @@ Lock a content item for editing.
 
 Add this line to your application's Gemfile:
 
-    gem 'padlock'
+    gem 'padlock-rails', require 'padlock'
 
 And then execute:
 
@@ -26,23 +26,41 @@ $ rake db:migrate
 #### User:
 
 Padlock will associate every lock to a User object.  Therefore, you need
-to specify the User type model:
+to specify the User type model. You also need to include the UserExtension module on the User class.
 
 ```ruby
-class User < ActiveRecord::Base
+class User < ApplicationRecord
+  include Padlock::UserExtension
   acts_as_padlock_user
+
+  has_many :widgets
 end
 ```
 
 Optionally set the foreign key:
 
 ```ruby
-class User < ActiveRecord::Base
-  acts_as_padlock_user foreign_key: "admin_id"
+class User < ApplicationRecord
+  include Padlock::UserExtension
+  acts_as_padlock_user, foreign_key: "admin_id"
+
+  has_many :widgets
 end
 ```
 
-Once activated a User object can have many lockable objects
+Once activated a User object can have many lockable objects...
+
+#### Lockable Objects
+
+You must explicitly include the Lockable module on any ActiveRecord class that can be locked:
+
+```ruby
+class Widget < ApplicationRecord
+  include Padlock::Lockable
+
+  belongs_to :user
+end
+```
 
 #### Locking:
 
@@ -65,16 +83,16 @@ Or check the status of a single object.
 current_user.locked?(lockable) # => true/false
 ```
 
-For integration with the Timeout gem, you can touch a lockable object and extend the padlock's TTL.
+For integration with the Timeout gem, you can touch a lockable object (or multiple) and extend the lock TTL(s).
 
 ```ruby
-currrent_user.touch(lockable_1 [, lockable, ...])
+Padlock.touch(lockable_1 [, lockable_2, ...])
 ```
 
 Padlocks can also be administered through the global Padlock object
 
 ```ruby
-Padlock.lock(current_user, lockable [, lockable, ...]) # => locks it to the user
+Padlock.lock(current_user, lockable [, lockable_2, ...]) # => locks it to the user
 Padlock.locked?(lockable)                              # => true/false
 Padlock.unlock!(lockable_1 [, lockable_2, ...])        # => unlocks a group of objects
 Padlock.unlocked?(lockable)                            # => true/false
