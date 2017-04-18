@@ -37,9 +37,6 @@ module Padlock
     end
 
     def touch *objects
-      # objects.select(&:locked?).each do |object|
-      #   object.update_attribute(:updated_at, Time.zone.now)
-      # end
       ids = objects.select(&:locked?).map(&:id)
       return nil if ids.empty?
       where(id: ids).update_all(updated_at: Time.zone.now)
