@@ -7,6 +7,8 @@ class CreatePadlocks < ActiveRecord::Migration
 
       t.timestamps
     end
+    add_index :padlocks, [:lockable_id, :lockable_type]
+    add_index :padlocks, :user_id
   end
 
   def down

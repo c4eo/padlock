@@ -21,7 +21,10 @@ module Padlock
     end
 
     def locked? object
-      self.padlocks.include? object
+      self.padlocks.where({
+        lockable_id: object.id,
+        lockable_type: object.class.name
+        }).exists?
     end
   end
 end

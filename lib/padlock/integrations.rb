@@ -1,1 +1,0 @@
-require File.expand_path("integrations/active_record", File.dirname(__FILE__))
