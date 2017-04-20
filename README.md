@@ -8,7 +8,7 @@ Lock a content item for editing.
 
 Add this line to your application's Gemfile:
 
-    gem 'padlock-rails', '>= 0.2.2', github: "c4eo/padlock", require 'padlock'
+    gem 'padlock-rails', '>= 0.2.3', github: "c4eo/padlock", require 'padlock'
 
 And then execute:
 

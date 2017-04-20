@@ -106,27 +106,35 @@ describe Padlock do
 
   describe ".touch" do
     let(:object) { LockableObject.create }
+    let(:object2) { LockableObject.create }
     let(:locked?) { true }
-    let(:fake_padlock) { double(:fake_padlock) }
+    let(:fake_padlocks) { double("fake_padlocks") }
+    let(:fake_padlock_ids) { [object.id, object2.id] }
 
     before do
       object.stub(:locked?).and_return(locked?)
-      object.stub(:padlock).and_return(fake_padlock)
+      # object.stub(:padlock).and_return(fake_padlock)
     end
 
     context "when locked" do
       let(:locked?) { true }
 
       it "sets a new value on the updated_at column and saves it" do
+        expect(object).to receive(:locked?).and_return(true)
+        expect(object2).to receive(:locked?).and_return(true)
         expect(object).to receive(:id)
-        proxy = double(:object)
+        expect(object2).to receive(:id)
+
+        proxy = double(:fake_padlocks)
         expect(proxy).to receive_message_chain("update_all")
           .with(hash_including(:updated_at => anything))
           .and_return(true)
-        expect(Padlock).to receive_message_chain("where")
-          .with(hash_including(:id))
+
+        expect(Padlock::Instance).to receive_message_chain("where")
+          .with(hash_including(:lockable_id))
           .and_return(proxy)
-        res = Padlock.touch(object)
+
+        res = Padlock.touch(object, object2)
         expect(res).to be_truthy
       end
     end
