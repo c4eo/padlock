@@ -110,6 +110,13 @@ lockable.lock_touched_at # => last time the padlock was updated
 lockable.unlock!   # => unsets the padlock
 ```
 
+#### Preloading the Padlock Owner
+
+```ruby
+widget = Widget.preload(:padlock_user).first # widget with preloaded padlock_user
+widget.padlock_user                          # user is already loaded
+```
+
 #### Stale Padlocks
 
 Lockables that have been locked for extended periods of time, may need to be reset.  In this case you can detect stale locks and unset them.
