@@ -4,6 +4,7 @@ module Padlock
 
     included do
       has_one :padlock, class_name: "Padlock::Instance", as: :lockable
+      has_one :padlock_user, through: :padlock, source: :user
     end
 
     def locked?
